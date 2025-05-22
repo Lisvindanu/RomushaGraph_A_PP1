@@ -21,7 +21,7 @@ public class FriendSearchService {
 
         //hitung jumlah teman
         int jumlahTeman = 0;
-        for (int i = 0; i<jumlahUser; i++) {
+        for (int i = 0; i < jumlahUser; i++) {
             if(adjacencyMatrix[index][i]) {
                 jumlahTeman++;
             }
@@ -34,9 +34,12 @@ public class FriendSearchService {
         //buat array teman
         User[] daftarTeman = new User[jumlahTeman];
         int temanIndex = 0;
-        for(int i=0; i<jumlahTeman; i++) {
-            daftarTeman[temanIndex] = graphCore.getUsersByIndex(i);
-            temanIndex++;
+        // FIX: Loop sampai jumlahUser dan cek adjacency matrix
+        for(int i = 0; i < jumlahUser; i++) {
+            if(adjacencyMatrix[index][i]) { // Cek apakah berteman
+                daftarTeman[temanIndex] = graphCore.getUsersByIndex(i);
+                temanIndex++;
+            }
         }
         return daftarTeman;
     }
@@ -56,7 +59,7 @@ public class FriendSearchService {
         User[] temanBersama = new User[jumlahUser];
         int jumlahTemanBersama = 0;
 
-        for(int i=0; i<jumlahUser; i++) {
+        for(int i = 0; i < jumlahUser; i++) {
             if(adjacencyMatrix[index1][i] && adjacencyMatrix[index2][i]) {
                 temanBersama[jumlahTemanBersama] = graphCore.getUsersByIndex(i);
                 jumlahTemanBersama++;
@@ -83,9 +86,9 @@ public class FriendSearchService {
         User[] saran = new User[jumlahUser];
         int jumlahSaran = 0;
 
-        // tandai diri sendiri dan teman lagnsung sebagai visiteed
+        // tandai diri sendiri dan teman langsung sebagai visited
         visited[index] = true;
-        for(int i=0; i<jumlahUser; i++) {
+        for(int i = 0; i < jumlahUser; i++) {
             if(adjacencyMatrix[index][i]) {
                 visited[i] = true;
             }
@@ -93,10 +96,11 @@ public class FriendSearchService {
 
         // cari teman dari teman (Level 2) - BFS implementasi
         for (int i = 0; i < jumlahUser; i++) {
-            if(adjacencyMatrix[index][i]) {
+            if(adjacencyMatrix[index][i]) { // untuk setiap teman langsung
                 for (int j = 0; j < jumlahUser; j++) {
-                    if(adjacencyMatrix[j][i] && !visited[j]) {
-                        saran[j] = graphCore.getUsersByIndex(i);
+                    // FIX: Urutan matrix dan assignment yang benar
+                    if(adjacencyMatrix[i][j] && !visited[j]) {
+                        saran[jumlahSaran] = graphCore.getUsersByIndex(j);
                         jumlahSaran++;
                         visited[j] = true;
                     }
@@ -148,5 +152,4 @@ public class FriendSearchService {
         }
         return userPopuler;
     }
-
 }

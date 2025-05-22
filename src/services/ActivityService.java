@@ -15,9 +15,9 @@ public class ActivityService {
 
     public boolean tambahAktifitas(Aktivitas aktivitas) {
         if (jumlahAktivitas >= maxAktivitas) {
-            //jika penuh, hapus aktifitas terlama (first in first out)
+            // FIX: Shift array ke kiri untuk hapus yang terlama (FIFO)
             for (int i = 0; i < maxAktivitas - 1; i++) {
-                daftarAktivitas[i] = aktivitas;
+                daftarAktivitas[i] = daftarAktivitas[i + 1];
             }
             daftarAktivitas[maxAktivitas - 1] = aktivitas;
             return true;
@@ -34,11 +34,11 @@ public class ActivityService {
         }
 
         System.out.println("\n=== Aktivitas terbaru ===");
-        //tampilkan 10 aktivitas terbaru
+        // FIX: Tampilkan dari yang terbaru (index tinggi ke rendah)
         int start = Math.max(0, jumlahAktivitas - 10);
-        for (int i = 0; i < jumlahAktivitas; i++) {
+        for (int i = jumlahAktivitas - 1; i >= start; i--) {
             if (daftarAktivitas[i] != null) {
-                System.out.println(jumlahAktivitas - i + ". " + daftarAktivitas[i].toString());
+                System.out.println((jumlahAktivitas - i) + ". " + daftarAktivitas[i].toString());
             }
         }
         System.out.println("==================================");
@@ -51,7 +51,7 @@ public class ActivityService {
 
         for (int i = jumlahAktivitas - 1; i >= 0; i--) {
             if (daftarAktivitas[i] != null &&
-            daftarAktivitas[i].getPengguna().getUsername().equals(username)) {
+                    daftarAktivitas[i].getPengguna().getUsername().equals(username)) {
                 System.out.println(" -" + daftarAktivitas[i].toString());
                 found = true;
             }
@@ -93,19 +93,20 @@ public class ActivityService {
         int[] countPerJenis = new int[5]; // regis, add fren, create grup, join grup, post
         String[] namajenis = {"register", "add_friend", "create_group", "join_group", "post" };
 
-        for(int i=0; i < jumlahAktivitas; i++) {
+        for(int i = 0; i < jumlahAktivitas; i++) {
             if (daftarAktivitas[i] != null) {
                 String jenis = daftarAktivitas[i].getJenisAktivitas();
-                for(int j=0; j < namajenis.length; j++) {
+                for(int j = 0; j < namajenis.length; j++) {
                     if (jenis.equals(namajenis[j])) {
-                        countPerJenis[i]++;
+                        // FIX: Gunakan index j bukan i untuk counting
+                        countPerJenis[j]++;
                         break;
                     }
                 }
             }
         }
         System.out.println("\nAktivitas per jenis:");
-        for(int i=0; i < countPerJenis.length; i++) {
+        for(int i = 0; i < countPerJenis.length; i++) {
             if (countPerJenis[i] > 0) {
                 System.out.println("- "+namajenis[i]+": "+countPerJenis[i]+" kali");
             }
@@ -115,13 +116,15 @@ public class ActivityService {
 
     //method untuk membuat aktivitas dengan mudah
     public void buatAktivitas(User pengguna, String jenis, String deskripsi) {
-        String id = "ACT" + String.format("%3d", jumlahAktivitas + 1);
+        // FIX: Tambah leading zeros dengan %03d
+        String id = "ACT" + String.format("%03d", jumlahAktivitas + 1);
         Aktivitas aktivitas = new Aktivitas(id, pengguna, jenis, deskripsi);
         tambahAktifitas(aktivitas);
     }
 
     public void buatAktivitas(User pengguna, String jenis, String deskripsi, String target) {
-        String id = "ACT" + String.format("%3d", jumlahAktivitas + 1);
+        // FIX: Tambah leading zeros dengan %03d
+        String id = "ACT" + String.format("%03d", jumlahAktivitas + 1);
         Aktivitas aktivitas = new Aktivitas(id, pengguna, jenis, deskripsi, target);
         tambahAktifitas(aktivitas);
     }
@@ -133,6 +136,4 @@ public class ActivityService {
     public Aktivitas[] getAktivitas() {
         return daftarAktivitas;
     }
-
-
 }
